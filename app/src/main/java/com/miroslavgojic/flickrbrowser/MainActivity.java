@@ -2,11 +2,24 @@ package com.miroslavgojic.flickrbrowser;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
+    private static final String LOG_TAG = "MainActivity";
+    private List<Photo> mPhotoList = new ArrayList<Photo>();
+    /*
+    To create complex lists and cards with material design styles in your apps,
+    we can use the RecyclerView and CardView widgets.
+    */
+    private RecyclerView mRecyclerView;
+    private FlickrRecyclerViewAdapter flickrRecyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,8 +31,14 @@ public class MainActivity extends AppCompatActivity {
 //        GetRawData getRawData = new GetRawData("https://api.flickr.com/services/feeds/photos_public.gne?tags=barcelona&format=json&nojsoncallback=1");
 //        getRawData.execute();
 
-        GetFlickrJsonData jsonData = new GetFlickrJsonData("barcelona, madrid", false);
-        jsonData.execute();
+//        GetFlickrJsonData jsonData = new GetFlickrJsonData("barcelona, madrid", false);
+//        jsonData.execute();
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        ProcessPhotos processPhotos = new ProcessPhotos("barcelona, madrid", false);
+        processPhotos.execute();
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -51,5 +70,31 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class ProcessPhotos extends GetFlickrJsonData{
+
+        public ProcessPhotos(String searchCriteria, boolean matchAll) {
+            super(searchCriteria, matchAll);
+        }
+
+        @Override
+        public void execute() {
+            // uzimamo JSON podatke
+            super.execute();
+            ProcessData processData = new ProcessData();
+            processData.execute();
+        }
+
+        public class ProcessData extends DownloadJsonData{
+            @Override
+            protected void onPostExecute(String webData) {
+                super.onPostExecute(webData);
+                // sada imamo podatke ,postavljamo adapter
+                flickrRecyclerViewAdapter = new FlickrRecyclerViewAdapter(MainActivity.this, getMPhotos());
+                //dodajemo adapter u view
+                mRecyclerView.setAdapter(flickrRecyclerViewAdapter);
+            }
+        }
     }
 }
