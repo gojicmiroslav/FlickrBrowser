@@ -15,8 +15,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        GetRawData getRawData = new GetRawData("https://api.flickr.com/services/feeds/photos_public.gne?tags=barcelona&format=json&nojsoncallback=1");
-        getRawData.execute();
+//        GetRawData getRawData = new GetRawData("https://api.flickr.com/services/feeds/photos_public.gne?tags=barcelona&format=json&nojsoncallback=1");
+//        getRawData.execute();
+
+        GetFlickrJsonData jsonData = new GetFlickrJsonData("barcelona, madrid", false);
+        jsonData.execute();
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
